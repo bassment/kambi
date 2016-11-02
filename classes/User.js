@@ -1,5 +1,5 @@
 // class User
-// @param `role` - accepts String or Number. Specify the role of a User
+// @param `role`:(NUMBER|STRING) - accepts String or Number. Specify the role of a User
 //
 // !description: class which helps to create users with roles.
 // !description: 0 is linked to 'normal' user

@@ -11,12 +11,10 @@
     <script>
         var calculatedPrice = 0;
         var anton = new User('company');
-        var iphone = new Product('new');
-        var price = 100;
-        var publishedDate = new Date();
+        var iphone = new Product(100, 'new');
 
         try {
-            calculatedPrice = calculatePrice(anton, iphone, price, publishedDate);
+            calculatedPrice = calculatePrice(anton, iphone);
         } catch (ex) {
             console.log(ex);
         }

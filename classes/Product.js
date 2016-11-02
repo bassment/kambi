@@ -1,42 +1,55 @@
 // class Product
-// @param `type` - accepts String or Number. Specify the type of a Product
+// @param `price`:(NUMBER) - *REQUIRED* parameter. Specify the price of your product. Can't be negative Number or a String.
+// @param `type`:(NUMBER|STRING) - accepts String or Number. Specify the type of a Product
 //
-// !description: class which helps to create products with types.
-// !description: 0 is linked to 'new' product
-// !description: 1 is linked to 'old' product
-// !description: returns {created: false} if parameter is wrong or with a wrong type
+// !description: class which helps to create products with `type`,  `price` and `publishedDate`.
+// !description: 0 `type` is linked to 'new' product
+// !description: 1 `type` is linked to 'old' product
+// !description: returns {created: false} if parameters are wrong OR with a wrong type OR `price` is not specified
 //
 // *Example of instance creation:
-// var iphone = new Product(0) --- creates product with type "new"
+// var iphone = new Product(1000, 'new') --- creates product with type "new" and price of '1000 SEK'
 // OR
-// var iphone = new Product("old") --- creates user with role "old"
+// var iphone = new Product(150, 1) --- creates product with type "old"
 //
 // *Example of public methods usage:
-// iphone.getType() --- returns "old"
+// iphone.getPrice() --- returns product PRIVATE product _price in SEK currency
+// iphone.setPrice(1000) --- set PRIVATE `_price` Class property to parameter's value(1000 in this case). The value can't by negative number or a String
+// iphone.getType() --- returns current PRIVATE property _type
 // iphone.setType(1) --- set PRIVATE `_type` Class property to parameter's value("old" in this case)
+// iphone.getPublishDate() --- returns publish date of a product. Date is set on an instance create
 //
-// !!!Note!!! constructor parameter is not required. Default role is set to 'new'
+// !!!Note!!! constructor parameter `price` IS *Required*. You could not create the instance without a price
+// !!!Note!!! constructor parameter `_type` is NOT required. Default role is set to 'new'
 
-function Product(type) {
+function Product(price, type) {
 	var self = this;
 
-	// define PRIVATE variable _type
-	var _type;
+	// define PRIVATE variables
+	var _type, _price, _publishDate;
 
 	// define defaults and publicAPI
 	var DEFAULT_TYPE = "new";
-	var publicAPI = { getType: getType, setType: setType };
+	var publicAPI = {
+		getPrice: getPrice,
+		setPrice: setPrice,
+		getType: getType,
+		setType: setType,
+		getPublishDate: getPublishDate
+	};
 
 	// define PUBLIC variables
 	this.staticTypes = ['new', 'old'];
 	this.messages = {
+		noParam: 'First Parameter(Price) is *required*, please specify it to create a Product instance.',
+		wrongParam: 'First Parameter(Price) should be the type of positive Number. The program will automatically convert your number to SEK currency afterwards.',
 		wrongType: 'Product Class only excepts a String or a Number as a type parameter.',
 		wrongNumber: 'Product has only 2 types. You can specify them by passing:\n' +
       '1 - to create "new" Product\n' +
       '2 - to create "old" Product\n' +
       'OR - pass in the regular string to constructor, like: "new" or "old"',
-		saved: 'Your value is successfully saved!',
-		notSaved: 'Sorry we can\'t save your value! ;('
+		saved: {status: 'saved', message: 'Your value is successfully saved!'},
+		notSaved: {status: 'failed', message: 'Sorry we can\'t save your value! ;('}
 	};
 
 
@@ -46,13 +59,27 @@ function Product(type) {
 			for(var method in publicAPI) {
 				self[method] = publicAPI[method];
 			}
+			_publishDate = new Date().toDateString();
 			self.created = true;
 			return true;
 		})(),
 		fail: { created: false }
 	};
 
-// Set 'new'(DEFAULT_TYPE const) - as a default Product type, if no parameters was passed
+	// Start Class instanciating Logic;
+	// ---------------------------------
+
+	// Price should be set in a constructor parameter. Returns an error if not specified
+	if(!price) {
+		console.log(self.messages.noParam);
+		return status.fail;
+	} else {
+		var priceSaved = validatePrice();
+		if(priceSaved.status === 'failed') return status.fail;
+	}
+
+
+	// Set 'new'(DEFAULT_TYPE const) - as a default Product type, if no parameters was passed
 	if(!type) {
 		_type = DEFAULT_TYPE;
 		return status.success;
@@ -65,21 +92,54 @@ function Product(type) {
 
 
 	// Defining extensible helper methods from here:
+	// ---------------------------------
+
 
 	// PUBLIC methods for Product Class:
+
+	function getPrice() {
+		var SEK_converted = _price.toString() + ' SEK'
+		return SEK_converted;
+	}
+
+	function setPrice(newPrice) {
+		return validatePrice(newPrice).message;
+	}
 
 	function getType() {
 		return _type;
 	}
 
 	function setType(newType) {
-		return typeCheck(newType);
+		var typeSaved = typeCheck(newType)
+		return typeSaved.message;
+	}
+
+	function getPublishDate() {
+		return _publishDate;
 	}
 
 	// PRIVATE methods to handle constructor parameters:
 
-	// Product Class only accepts a Number or a String as a constructor parameter
+	function validatePrice(newPrice) {
+		// Use `price` from constructor parameter on Class initialization
+		if(!newPrice) newPrice = price;
+
+		if(typeof newPrice === 'number' && newPrice >= 0) {
+			_price = newPrice;
+		} else {
+			console.error(self.messages.wrongParam);
+		}
+
+		// Return a status and a message for this `price` update operation
+		return newPrice === _price
+			? self.messages.saved
+			: self.messages.notSaved;
+	}
+
+	// Product Class only accepts a Number or a String as a constructor parameter for type
 	function typeCheck(newType) {
+		// Use `type` from constructor parameter on Class initialization
 		if(!newType && newType !== 0) newType = type;
 
 		switch(typeof newType) {
@@ -93,7 +153,10 @@ function Product(type) {
 				console.error(self.messages.wrongType);
 		}
 
-		return newType === _type ? self.messages.saved : self.messages.notSaved;
+		// Return a status and a message for this `type` update operation
+		return newType === _type
+			? self.messages.saved
+			: self.messages.notSaved;
 	}
 
 	function handleNumber(newType) {
@@ -105,11 +168,13 @@ function Product(type) {
 	}
 
 	function handleString(newType) {
-    var lowType = newType.toLowerCase();
+
+    	var lowType = newType.toLowerCase();
 		if(lowType === 'new' || lowType === 'old') {
 			_type = lowType;
 		} else if(newType === '0' || newType === '1') {
-			var roleToNumber = parseInt(_type);
+			var roleToNumber = parseInt(newType);
+			console.log(roleToNumber)
 			_type = self.staticTypes[roleToNumber];
 		} else {
 			console.error(self.messages.wrongNumber);

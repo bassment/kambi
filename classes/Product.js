@@ -31,6 +31,7 @@ function Product(price, type) {
 	// define defaults and publicAPI
 	var DEFAULT_TYPE = "new";
 	var publicAPI = {
+		calculatePriceForUser: calculatePriceForUser,
 		getPrice: getPrice,
 		setPrice: setPrice,
 		getType: getType,
@@ -43,6 +44,7 @@ function Product(price, type) {
 	this.messages = {
 		noParam: 'First Parameter(Price) is *required*, please specify it to create a Product instance.',
 		wrongParam: 'First Parameter(Price) should be the type of positive Number. The program will automatically convert your number to SEK currency afterwards.',
+		wrongInstance: {done: false, message: 'Calculate method only excepts instances of Class User. Please specify correct instance.'},
 		wrongType: 'Product Class only excepts a String or a Number as a type parameter.',
 		wrongNumber: 'Product has only 2 types. You can specify them by passing:\n' +
       '1 - to create "new" Product\n' +
@@ -71,7 +73,7 @@ function Product(price, type) {
 
 	// Price should be set in a constructor parameter. Returns an error if not specified
 	if(!price) {
-		console.log(self.messages.noParam);
+		console.error(self.messages.noParam);
 		return status.fail;
 	} else {
 		var priceSaved = validatePrice();
@@ -94,6 +96,45 @@ function Product(price, type) {
 	// Defining extensible helper methods from here:
 	// ---------------------------------
 
+	// PUBLIC calculate for specified User method
+	function calculatePriceForUser(user) {
+		// Return with error if User Class instance was not provided in method argument list
+		if(!(user instanceof User)) {
+			var msg_stat = self.messages.wrongInstance;
+			console.error(msg_stat.message);
+			return msg_stat;
+		}
+
+		var currentDate = new Date().toDateString();
+		var enddateDiscount = 0;
+
+		// Get User Role to Calculate correct price
+		var userRole = user.getRole();
+
+		// Calculation Logic
+		switch (userRole) {
+			case 'normal':
+				if (_type == 'new') { // new product
+					if (_publishDate == currentDate) enddateDiscount = 10;
+
+					return _price + 25 - enddateDiscount;
+				} else if (productType == 'old') { // old product
+					return _price + 35 - 0;
+				}
+				break;
+			case 'company': // company
+				if (_type == 'new') { // new product
+					if (_publishDate == currentDate) {
+							return price + 25 - 15;// Enddate discount and company discount
+					}
+
+					return _price + 25 - 5;// Only company discount
+				} else if (_type == 'old') { // old product
+					return _price + 35 - 5;
+				}
+				break;
+		}
+	}
 
 	// PUBLIC methods for Product Class:
 
@@ -174,7 +215,6 @@ function Product(price, type) {
 			_type = lowType;
 		} else if(newType === '0' || newType === '1') {
 			var roleToNumber = parseInt(newType);
-			console.log(roleToNumber)
 			_type = self.staticTypes[roleToNumber];
 		} else {
 			console.error(self.messages.wrongNumber);

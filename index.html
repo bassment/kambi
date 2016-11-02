@@ -9,17 +9,32 @@
     <script src="classes/Product.js" charset="utf-8"></script>
     <script src="src/price-calculator.js"></script>
     <script>
-        var calculatedPrice = 0;
-        var anton = new User('company');
+        var anton = new User('normal');
         var iphone = new Product(100, 'new');
 
+        var jesper = new User('company');
+        var ipad = new Product(200, 'old');
+
         try {
-            calculatedPrice = calculatePrice(anton, iphone);
+            // For iPhone
+            calculatedPriceIphone = calculatePrice(anton, iphone);
+            calculatedFromProductIphone = iphone.calculatePriceForUser(anton);
+            // For iPad
+            calculatedPriceIpad = calculatePrice(jesper, ipad);
+            calculatedFromProductIpad = ipad.calculatePriceForUser(jesper);
         } catch (ex) {
             console.log(ex);
         }
 
-        console.log('Calculated price:', calculatedPrice);
+        console.log('iPhone comparison:');
+        console.log('1. Calculated iPhone price:', calculatedPriceIphone);
+        console.log('---------------------------------------------');
+        console.log('2. Calculated iPhone price using Product Class method:', calculatedFromProductIphone);
+        console.log('---------------------------------------------');
+        console.log('Ipad comparison:');
+        console.log('1. Calculated iPad price:', calculatedPriceIpad);
+        console.log('---------------------------------------------');
+        console.log('2. Calculated iPad price using Product Class method:', calculatedFromProductIpad);
     </script>
 </body>
 </html>

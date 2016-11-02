@@ -13,13 +13,32 @@
 //
 // *Example of public methods usage:
 // andy.getRole() --- returns "company"
+// andy.setRole('normal') --- set PRIVATE `_role` Class property to parameter's value
 //
 // !!!Note!!! constructor parameter is not required. Default role is set to 'normal'
 
 function User(role) {
 	var self = this;
+
+	// define PRIVATE variable _role
+	var _role;
+
+	// define defaults and publicAPI
 	var DEFAULT_ROLE = "normal";
-	var publicAPI = { getRole: getRole };
+	var publicAPI = { getRole: getRole, setRole: setRole };
+
+	// define PUBLIC variables
+	this.staticRoles = ['normal', 'company'];
+	this.messages = {
+		wrongType: 'User Class only excepts a String or a Number as a role parameter.',
+		wrongNumber: 'User has only 2 roles. You can specify them by passing:\n' +
+			'1 - to create "normal" User\n' +
+			'2 - to create "company" User\n' +
+			'OR - pass in the regular string to constructor, like: "normal" or "company"',
+		saved: 'Your value is successfully saved!',
+		notSaved: 'Sorry we can\'t save your value! ;('
+	};
+
 
 	// Define the statuses for User instance creation
 	var status = {
@@ -33,60 +52,73 @@ function User(role) {
 		fail: { created: false }
 	};
 
-	// Set 'normal'(DEFAULT_ROLE const) - as a default User, if no parameters was passed
+	// Set 'normal'(DEFAULT_ROLE const) - as a default User role, if no parameters was passed
 	if(!role) {
-		this.role = DEFAULT_ROLE;
+		_role = DEFAULT_ROLE;
 		return status.success;
 	}
 
-	var staticRoles = ['normal', 'company'];
-	var messages = {
-		wrongType: 'User Class only excepts a String or a Number as a role parameter.',
-		wrongNumber: 'User has only 2 types. You can specify them by passing:\n 1 - to create "normal" User\n 2 - to create "company" User\n OR - pass in the regular string to constructor, like: "normal" or "company"'
-	};
+	// validation method from PRIVATE methods below
+	typeCheck();
 
 
-	// User Class only accepts a Number or a String as a constructor parameter
-	switch(typeof role) {
-		case 'number':
-			handleNumber();
-			break;
-		case 'string':
-			handleString();
-			break;
-		default:
-			console.error(messages.wrongType);
-	}
+	// End of User instance creation logic, retuns the status of instance creation
+	return _role ? status.success : status.fail;
 
-	// end of User instance creation logic, retuns the status of instance creation
-	return this.role ? status.success : status.fail;
 
-	// Defining extensible helper methods from here:
+
+	// Defining extensible Helper methods from here:
+
 
 	// PUBLIC methods for User Class:
 
 	function getRole() {
-		return self.role;
+		return _role;
 	}
+
+	function setRole(newRole) {
+		return typeCheck(newRole);
+	}
+
 
 	// PRIVATE methods to handle constructor parameters:
 
-	function handleNumber() {
-		if(role === 0 || role === 1) {
-			self.role = staticRoles[role];
+	// User Class only accepts a Number or a String as a constructor parameter
+	function typeCheck(newRole) {
+		// Use `role` from constructor parameter on Class initialization
+		if(!newRole && newRole !== 0) newRole = role;
+
+		switch(typeof newRole) {
+			case 'number':
+				handleNumber(newRole);
+				break;
+			case 'string':
+				handleString(newRole);
+				break;
+			default:
+				console.error(self.messages.wrongType);
+		}
+
+		return newRole === _role ? self.messages.saved : self.messages.notSaved;
+	}
+
+	function handleNumber(newRole) {
+		if(newRole === 0 || newRole === 1) {
+			_role = self.staticRoles[newRole];
 		} else {
-			console.error(messages.wrongNumber);
+			console.error(self.messages.wrongNumber);
 		}
 	}
 
-	function handleString() {
-		if(role === 'normal' || role === 'company') {
-			self.role = role;
-		} else if(role === '0' || role === '1') {
-			var roleToNumber = parseInt(role);
-			self.role = staticRoles[roleToNumber];
+	function handleString(newRole) {
+		var lowRole = newRole.toLowerCase();
+		if(lowRole === 'normal' || lowRole === 'company') {
+			_role = lowRole;
+		} else if(newRole === '0' || newRole === '1') {
+			var roleToNumber = parseInt(newRole);
+			_role = self.staticRoles[roleToNumber];
 		} else {
-			console.error(messages.wrongNumber);
+			console.error(self.messages.wrongNumber);
 		}
 	}
 }

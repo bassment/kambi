@@ -6,16 +6,17 @@
 <body>
     <h3>Please check the console for output.</h3>
     <script src="classes/User.js" charset="utf-8"></script>
+    <script src="classes/Product.js" charset="utf-8"></script>
     <script src="src/price-calculator.js"></script>
     <script>
         var calculatedPrice = 0;
         var anton = new User('company');
-        var productType = 0;
+        var iphone = new Product('new');
         var price = 100;
         var publishedDate = new Date();
 
         try {
-            calculatedPrice = calculatePrice(anton, productType, price, publishedDate);
+            calculatedPrice = calculatePrice(anton, iphone, price, publishedDate);
         } catch (ex) {
             console.log(ex);
         }

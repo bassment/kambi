@@ -1,9 +1,9 @@
 // userType, 0 = normal, 1 = company
 // productType, 0 = new product, 1 = old product
 // price, the price of the product
-var calculatePrice = function (userType, productType, price, publishedDate) {
+var calculatePrice = function (user, productType, price, publishedDate) {
 	try	{
-		switch (userType.role) {
+		switch (user.role) {
 		case 'normal': // normal
 			if (productType == 0) { // new product
 				var enddateDiscount = 0;

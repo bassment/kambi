@@ -12,20 +12,23 @@
 // var andy = new User("normal") --- creates user with role "normal"
 //
 // *Example of public methods usage:
-// andy.getRole() --- returns "company"
+// andy.getRole() --- returns user's `role`
 // andy.setRole('normal') --- set PRIVATE `_role` Class property to parameter's value
+// andy.getDiscount() --- calculates discount which depends on user `role`
 //
 // !!!Note!!! constructor parameter is not required. Default role is set to 'normal'
 
 function User(role) {
 	var self = this;
 
-	// define PRIVATE variable _role
-	var _role;
-
 	// define defaults and publicAPI
 	var DEFAULT_ROLE = "normal";
-	var publicAPI = { getRole: getRole, setRole: setRole };
+	var CORPORATE_DISCOUNT = 5;
+
+	var publicAPI = { getRole: getRole, setRole: setRole, getDiscount: getDiscount };
+
+	// define PRIVATE variable _role
+	var _role;
 
 	// define PUBLIC variables
 	this.staticRoles = ['normal', 'company'];
@@ -78,6 +81,10 @@ function User(role) {
 
 	function setRole(newRole) {
 		return typeCheck(newRole);
+	}
+
+	function getDiscount() {
+		return _role === 'company' ? CORPORATE_DISCOUNT : 0;
 	}
 
 

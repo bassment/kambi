@@ -13,6 +13,7 @@
 // var iphone = new Product(150, 1) --- creates product with type "old"
 //
 // *Example of public methods usage:
+// iphone.calculatePriceForUser(user):(User) --- returns final price for a specified User.
 // iphone.getPrice() --- returns product PRIVATE product _price in SEK currency
 // iphone.setPrice(1000) --- set PRIVATE `_price` Class property to parameter's value(1000 in this case). The value can't by negative number or a String
 // iphone.getType() --- returns current PRIVATE property _type
@@ -25,11 +26,12 @@
 function Product(price, type) {
 	var self = this;
 
-	// define PRIVATE variables
-	var _type, _price, _publishDate;
-
 	// define defaults and publicAPI
 	var DEFAULT_TYPE = "new";
+	var ADDITIONAL_NEW_PRODUCT_PRICE = 25;
+	var ADDITIONAL_OLD_PRODUCT_PRICE = 35;
+	var TODAY_PRODUCT_DISCOUNT = 10;
+
 	var publicAPI = {
 		calculatePriceForUser: calculatePriceForUser,
 		getPrice: getPrice,
@@ -38,6 +40,9 @@ function Product(price, type) {
 		setType: setType,
 		getPublishDate: getPublishDate
 	};
+
+	// define PRIVATE variables
+	var _type, _price, _publishDate;
 
 	// define PUBLIC variables
 	this.staticTypes = ['new', 'old'];
@@ -106,35 +111,25 @@ function Product(price, type) {
 		}
 
 		var currentDate = new Date().toDateString();
-		var enddateDiscount = 0;
 
 		// Get User Role to Calculate correct price
 		var userRole = user.getRole();
+		var userDiscount = user.getDiscount();
 
-		// Calculation Logic
-		switch (userRole) {
-			case 'normal':
-				if (_type == 'new') { // new product
-					if (_publishDate == currentDate) enddateDiscount = 10;
 
-					return _price + 25 - enddateDiscount;
-				} else if (productType == 'old') { // old product
-					return _price + 35 - 0;
-				}
-				break;
-			case 'company': // company
-				if (_type == 'new') { // new product
-					if (_publishDate == currentDate) {
-							return price + 25 - 15;// Enddate discount and company discount
-					}
+		// Calculation Formula from requirements
+		var additionalPrice = _type === 'new'
+			? ADDITIONAL_NEW_PRODUCT_PRICE : ADDITIONAL_OLD_PRODUCT_PRICE;
 
-					return _price + 25 - 5;// Only company discount
-				} else if (_type == 'old') { // old product
-					return _price + 35 - 5;
-				}
-				break;
-		}
+		var formula = _price + additionalPrice - userDiscount;
+
+		// Find out if it is needed to apply rebate for 'new' + 'today' product
+		var finalPrice = _publishDate === currentDate && _type === 'new'
+			? formula - TODAY_PRODUCT_DISCOUNT : formula;
+
+		return finalPrice.toString() + ' SEK';
 	}
+
 
 	// PUBLIC methods for Product Class:
 

@@ -5,9 +5,9 @@
 </head>
 <body>
     <h3>Please check the console for output.</h3>
-    <script src="classes/User.js" charset="utf-8"></script>
-    <script src="classes/Product.js" charset="utf-8"></script>
-    <script src="src/price-calculator.js"></script>
+    <script src="src/User.js" charset="utf-8"></script>
+    <script src="src/Product.js" charset="utf-8"></script>
+    <!-- <script src="src/price-calculator.js"></script> -->
     <script>
         var anton = new User('normal');
         var iphone = new Product(100, 'new');
@@ -17,24 +17,21 @@
 
         try {
             // For iPhone
-            calculatedPriceIphone = calculatePrice(anton, iphone);
-            calculatedFromProductIphone = iphone.calculatePriceForUser(anton);
+            calculatedPriceIphone = iphone.calculatePriceForUser(anton);
             // For iPad
-            calculatedPriceIpad = calculatePrice(jesper, ipad);
-            calculatedFromProductIpad = ipad.calculatePriceForUser(jesper);
+            calculatedPriceIpad = ipad.calculatePriceForUser(jesper);
+
         } catch (ex) {
             console.log(ex);
         }
 
-        console.log('iPhone comparison:');
-        console.log('1. Calculated iPhone price:', calculatedPriceIphone);
+        console.log('iPhone:');
+        console.log('Calculated price:', calculatedPriceIphone);
+
         console.log('---------------------------------------------');
-        console.log('2. Calculated iPhone price using Product Class method:', calculatedFromProductIphone);
-        console.log('---------------------------------------------');
-        console.log('Ipad comparison:');
-        console.log('1. Calculated iPad price:', calculatedPriceIpad);
-        console.log('---------------------------------------------');
-        console.log('2. Calculated iPad price using Product Class method:', calculatedFromProductIpad);
+        
+        console.log('Ipad:');
+        console.log('Calculated price:', calculatedPriceIpad);
     </script>
 </body>
 </html>

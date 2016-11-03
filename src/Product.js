@@ -77,7 +77,7 @@ function Product(price, type) {
 	// ---------------------------------
 
 	// Price should be set in a constructor parameter. Returns an error if not specified
-	if(!price) {
+	if(!price && price !== 0) {
 		console.error(self.messages.noParam);
 		return status.fail;
 	} else {
